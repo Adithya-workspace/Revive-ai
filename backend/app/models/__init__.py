@@ -3,3 +3,4 @@ from app.models.customer import Customer
 from app.models.transaction import Transaction
 from app.models.checkout_session import CheckoutSession
 from app.models.invoice import Invoice
+from app.models.revenue_risk_case import RevenueRiskCase
