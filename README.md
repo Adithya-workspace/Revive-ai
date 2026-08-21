@@ -38,7 +38,7 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 3** — Database schema (`merchants`, `customers`, `transactions`, `checkout_sessions`, `invoices`, `revenue_risk_cases`) migrated to Neon via Alembic
 - [x] **Phase 4** — Synthetic data generator: 870 customers across 6 behavioral archetypes, 10,600+ reproducible revenue events (seed=42)
 - [x] **Phase 5** — Deterministic revenue detection layer: 2,529 revenue-risk cases detected across all three MVP scenarios, idempotent and re-runnable
-- [ ] **Phase 6** — Recovery scoring
+- [x] **Phase 6** — Recovery scoring: 2,529 cases scored using a transparent, factor-based model (scenario baseline, customer history, retry count, case age, amount) — average recovery probability 0.503, explicitly labeled as rules-based (not ML)
 - [ ] **Phase 7** — AI diagnosis
 - [ ] **Phase 8** — Recovery strategy agent
 - [ ] **Phase 9** — Policy / guardrail engine
