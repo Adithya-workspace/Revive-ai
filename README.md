@@ -114,31 +114,26 @@ npm run dev
 
 Runs at `http://localhost:3000`.
 
----
-
-## Project structure
-
+```
 revive-ai/
 ├── backend/
-│ ├── app/
-│ │ ├── main.py # FastAPI entrypoint
-│ │ ├── api/ # route handlers
-│ │ ├── detection/ # deterministic risk detection rules
-│ │ ├── agents/ # LangGraph agent graph (Phase 7+)
-│ │ ├── policies/ # policy/guardrail engine (Phase 9+)
-│ │ ├── actions/ # action executor (Phase 10+)
-│ │ ├── models/ # SQLAlchemy models
-│ │ └── database.py # DB connection/session management
-│ ├── database/migrations/ # Alembic migrations
-│ ├── scripts/ # CLI utilities (data gen, detection, etc.)
-│ └── evaluation/ # batch evaluation engine (Phase 17)
-├── frontend/ # Next.js dashboard
+│   ├── app/
+│   │   ├── main.py              # FastAPI entrypoint
+│   │   ├── api/                 # route handlers
+│   │   ├── detection/           # deterministic risk detection rules
+│   │   ├── agents/              # LangGraph agent graph (Phase 7+)
+│   │   ├── policies/            # policy/guardrail engine (Phase 9+)
+│   │   ├── actions/              # action executor (Phase 10+)
+│   │   ├── models/                # SQLAlchemy models
+│   │   └── database.py            # DB connection/session management
+│   ├── database/migrations/       # Alembic migrations
+│   ├── scripts/                   # CLI utilities (data gen, detection, etc.)
+│   └── evaluation/                # batch evaluation engine (Phase 17)
+├── frontend/                      # Next.js dashboard
 └── docs/
-├── ARCHITECTURE.md
-└── REVIVE_AI_Phase0_Planning.md
-
-
----
+    ├── ARCHITECTURE.md
+    └── REVIVE_AI_Phase0_Planning.md
+```
 
 ## Key design principles
 
