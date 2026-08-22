@@ -41,7 +41,7 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 6** — Recovery scoring: 2,529 cases scored using a transparent, factor-based model (scenario baseline, customer history, retry count, case age, amount) — average recovery probability 0.503, explicitly labeled as rules-based (not ML)
 - [x] **Phase 7** — Hybrid diagnosis: 1,808 of 2,529 cases diagnosed (1,628 resolved deterministically via rules, 180 via LLM reasoning for ambiguous checkout-abandonment cases using Llama 3.3/gpt-oss-120b via Groq). Remaining 721 cases queued for a future run before final evaluation — idempotent, safe to resume anytime.
 - [x] **Phase 8** — Recovery strategy agent: 1,808 cases strategized using deterministic override rules on top of diagnosis (low-confidence → escalate, low-probability → stop, high-value → escalate). Total expected recoverable value: ₹1,02,32,059.80. No LLM calls in this stage.
-- [ ] **Phase 9** — Policy / guardrail engine
+- [x] **Phase 9** — Policy / guardrail engine: 1,808 proposed actions evaluated against three versioned, database-backed policies (max 2 automatic retries, ₹5,000 automatic-action ceiling, 0.60 minimum confidence). Result: 784 approved, 726 routed to human, 298 rejected outright (retry cap violations). Zero LLM involvement — this is the pure deterministic authorization boundary between AI suggestions and real actions.
 - [ ] **Phase 10** — Action execution layer
 - [ ] **Phase 11** — Verification
 - [ ] **Phase 12** — Audit trail
