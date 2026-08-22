@@ -27,7 +27,7 @@ diagnose → score → strategy → policy → act → verify
 PostgreSQL (Neon) + Audit Trail
 
 
-**Tech stack:** FastAPI + SQLAlchemy + Alembic (backend), Next.js + TypeScript + Tailwind (frontend), PostgreSQL on Neon, LangGraph for agent orchestration, Anthropic Claude for reasoning/diagnosis/messaging — with a hard rule that the policy engine never involves an LLM call.
+**Tech stack:** FastAPI + SQLAlchemy + Alembic (backend), Next.js + TypeScript + Tailwind (frontend), PostgreSQL on Neon, LangGraph for agent orchestration, Llama 3.3/gpt-oss-120b via Groq for LLM reasoning (diagnosis, messaging) — with a hard rule that the policy engine never involves an LLM call.
 
 ---
 
@@ -39,7 +39,7 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 4** — Synthetic data generator: 870 customers across 6 behavioral archetypes, 10,600+ reproducible revenue events (seed=42)
 - [x] **Phase 5** — Deterministic revenue detection layer: 2,529 revenue-risk cases detected across all three MVP scenarios, idempotent and re-runnable
 - [x] **Phase 6** — Recovery scoring: 2,529 cases scored using a transparent, factor-based model (scenario baseline, customer history, retry count, case age, amount) — average recovery probability 0.503, explicitly labeled as rules-based (not ML)
-- [ ] **Phase 7** — AI diagnosis
+- [x] **Phase 7** — Hybrid diagnosis: 1,808 of 2,529 cases diagnosed (1,628 resolved deterministically via rules, 180 via LLM reasoning for ambiguous checkout-abandonment cases using Llama 3.3/gpt-oss-120b via Groq). Remaining 721 cases queued for a future run before final evaluation — idempotent, safe to resume anytime.
 - [ ] **Phase 8** — Recovery strategy agent
 - [ ] **Phase 9** — Policy / guardrail engine
 - [ ] **Phase 10** — Action execution layer
