@@ -6,3 +6,4 @@ from app.models.invoice import Invoice
 from app.models.revenue_risk_case import RevenueRiskCase
 from app.models.diagnosis import Diagnosis
 from app.models.recovery_action import RecoveryAction
+from app.models.policy import Policy
