@@ -50,17 +50,7 @@ class LLMDiagnosisOutput(BaseModel):
         return v
 
 
-ALLOWED_NEXT_STEPS = {
-    "RETRY_PAYMENT",
-    "DELAYED_RETRY",
-    "SEND_PAYMENT_REMINDER",
-    "SEND_CHECKOUT_RECOVERY_MESSAGE",
-    "SEND_OVERDUE_REMINDER",
-    "TRACK_PROMISE_TO_PAY",
-    "ESCALATE_TO_HUMAN",
-    "STOP_RECOVERY_ATTEMPTS",
-}
-
+from app.constants import ALLOWED_ACTIONS as ALLOWED_NEXT_STEPS
 
 SYSTEM_PROMPT = """You are a diagnosis component inside a revenue recovery system.
 Your job is to explain WHY a specific piece of revenue is at risk, based only on
