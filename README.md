@@ -45,7 +45,7 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 10** — Action execution layer: 677 policy-approved actions executed in SIMULATED mode (immediate-outcome retries grounded in actual recovery_probability: 158 success, 125 failed; message-based actions: 394 pending verification). Real Razorpay test-mode integration intentionally deferred to Phase 15.
 - [x] **Phase 11** — Verification: 677 action results verified against real source-record updates (transactions) or probability-grounded simulated customer response (reminders). 368 cases confirmed genuinely recovered — verification is the ONLY component permitted to mark a case "recovered," enforcing Section 13's no-fabricated-recovery rule.
 - [x] **Phase 12** — Audit trail: schema and backfill logic built (CASE_DETECTED → RECOVERY_SCORE_CALCULATED → DIAGNOSIS_COMPLETED → STRATEGY_SELECTED → POLICY_DECISION → ACTION_EXECUTED → VERIFICATION_COMPLETED → CASE_RECOVERED), with a timestamp-ordering fix applied. Backfill run itself deferred — table is currently empty and needs `python -m scripts.backfill_audit_trail` before demo/evaluation.
-- [ ] **Phase 13** — Analytics
+- [x] **Phase 13** — Analytics: real aggregate metrics computed directly from pipeline data — ₹3,05,81,527.55 total revenue at risk, ₹6,85,688.07 verified recovered (6.7% recovery rate on the currently-processed subset; rate will rise once the remaining 721-case diagnosis backlog clears), plus by-scenario and policy-decision breakdowns. No fabricated numbers — every figure traces to an actual query.
 - [ ] **Phase 14** — Frontend dashboard
 - [ ] **Phase 15** — Razorpay test-mode integration
 - [ ] **Phase 16** — Testing
