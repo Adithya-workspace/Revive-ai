@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Backgrounds */
+  --color-ink: #0a0e12;
+  --color-surface: #12171d;
+  --color-surface-raised: #171d24;
+  --color-border: #232b33;
+  --color-border-strong: #2f3944;
+
+  /* Text */
+  --color-text: #edf1f4;
+  --color-text-muted: #8a96a3;
+  --color-text-faint: #5c6773;
+
+  /* Status — carries real meaning, not decoration */
+  --color-recovered: #3fb68a;
+  --color-recovered-dim: #1f3d34;
+  --color-at-risk: #e8a33d;
+  --color-at-risk-dim: #3d3320;
+  --color-critical: #e2574c;
+  --color-critical-dim: #3d2422;
+  --color-accent: #6c8cff;
+  --color-accent-dim: #1f2a4d;
+
+  /* Fonts */
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Numbers should always read like a ledger — tabular, aligned */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: var(--color-accent-dim);
+    color: var(--color-text);
+  }
+
+  /* Visible, deliberate focus states — never remove outline without replacing it */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-faint);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Signature motif: a pulse/ECG line, used as the app-wide loading state */
+  @keyframes pulse-draw {
+    0% {
+      stroke-dashoffset: 240;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .animate-pulse-draw {
+    stroke-dasharray: 240;
+    animation: pulse-draw 1.6s ease-in-out infinite;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.35s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse-draw,
+    .animate-fade-in-up {
+      animation: none;
+    }
+  }
 }

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import detection, scoring, diagnosis, strategy, policy, actions, verification, analytics
+from app.api import detection, scoring, diagnosis, strategy, policy, actions, verification, analytics, cases, merchants
 
 app = FastAPI(
     title="REVIVE AI",
@@ -25,6 +25,8 @@ app.include_router(policy.router)
 app.include_router(actions.router)
 app.include_router(verification.router)
 app.include_router(analytics.router)
+app.include_router(cases.router)
+app.include_router(merchants.router)
 @app.get("/")
 def root():
     return {"status": "ok", "service": "revive-ai-backend"}

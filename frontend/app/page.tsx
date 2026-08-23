@@ -1,69 +1,136 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useQuery } from "@tanstack/react-query";
+import { fetchMerchants, fetchAnalytics } from "@/lib/api";
+import { Card } from "@/components/ui/Card";
+import { PulseLoader } from "@/components/PulseLoader";
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function KpiCard({
+  label,
+  value,
+  sublabel,
+  accent = "text",
+}: {
+  label: string;
+  value: string;
+  sublabel?: string;
+  accent?: "text" | "recovered" | "at-risk" | "accent";
+}) {
+  const accentClass = {
+    text: "text-text",
+    recovered: "text-recovered",
+    "at-risk": "text-at-risk",
+    accent: "text-accent",
+  }[accent];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <Card className="animate-fade-in-up">
+      <p className="text-xs font-medium text-text-muted uppercase tracking-wide">{label}</p>
+      <p className={`font-mono tabular-nums text-2xl font-semibold mt-2 ${accentClass}`}>
+        {value}
+      </p>
+      {sublabel && <p className="text-xs text-text-faint mt-1">{sublabel}</p>}
+    </Card>
+  );
+}
+
+export default function DashboardPage() {
+  const { data: merchants } = useQuery({
+    queryKey: ["merchants"],
+    queryFn: fetchMerchants,
+  });
+
+  const merchantId = merchants?.[0]?.id;
+
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ["analytics", merchantId],
+    queryFn: () => fetchAnalytics(merchantId!),
+    enabled: !!merchantId,
+  });
+
+  if (isLoading || !analytics) {
+    return <PulseLoader label="Loading dashboard..." />;
+  }
+
+  const { overview, by_scenario, policy_decisions } = analytics;
+
+  return (
+    <div className="space-y-6 max-w-6xl">
+      <div>
+        <h1 className="font-display text-2xl font-semibold text-text">Dashboard</h1>
+        <p className="text-sm text-text-muted mt-1">
+          Real-time overview of revenue at risk and recovery performance.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        <KpiCard
+          label="Revenue at Risk"
+          value={formatCurrency(overview.total_revenue_at_risk)}
+          sublabel={`${overview.total_cases} cases detected`}
+          accent="at-risk"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        <KpiCard
+          label="Potentially Recoverable"
+          value={formatCurrency(overview.potentially_recoverable_revenue)}
+          sublabel="Expected value across strategy"
+          accent="accent"
+        />
+        <KpiCard
+          label="Revenue Recovered"
+          value={formatCurrency(overview.recovered_revenue)}
+          sublabel={`${overview.recovered_cases} cases confirmed`}
+          accent="recovered"
+        />
+        <KpiCard
+          label="Recovery Rate"
+          value={`${(overview.recovery_rate * 100).toFixed(1)}%`}
+          sublabel="Recovered / recoverable"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <h2 className="font-display text-sm font-semibold text-text mb-4">By Scenario</h2>
+          <div className="space-y-3">
+            {by_scenario.map((s) => (
+              <div key={s.scenario} className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text capitalize">
+                    {s.scenario.replace(/_/g, " ")}
+                  </p>
+                  <p className="text-xs text-text-faint">
+                    {s.recovered_count} / {s.case_count} recovered
+                  </p>
+                </div>
+                <p className="font-mono tabular-nums text-sm text-recovered">
+                  {(s.recovery_rate * 100).toFixed(1)}%
+                </p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="font-display text-sm font-semibold text-text mb-4">Policy Decisions</h2>
+          <div className="space-y-3">
+            {Object.entries(policy_decisions).map(([decision, count]) => (
+              <div key={decision} className="flex items-center justify-between">
+                <p className="text-sm text-text-muted">{decision.replace(/_/g, " ")}</p>
+                <p className="font-mono tabular-nums text-sm text-text">{count}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
