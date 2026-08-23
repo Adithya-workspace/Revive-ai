@@ -137,28 +137,43 @@ def _bulk_write_scores(db: Session, updates: list[tuple[uuid.UUID, float]]) -> N
     """
     Writes all (case_id, recovery_probability) pairs to the database in a
     small number of batched round trips, using psycopg2's execute_values
-    against a raw UPDATE ... FROM (VALUES ...) statement. This is what
-    actually makes bulk-updating thousands of rows fast — a true SQL-level
-    bulk operation, not per-row ORM writes.
+    against a raw UPDATE ... FROM (VALUES ...) statement. Also stamps
+    last_scored_at with the current time — since this bypasses the ORM,
+    it needs to be set explicitly here rather than relying on any
+    onupdate hook (which only fires on ORM-tracked writes).
     """
     if not updates:
         return
 
+    now = datetime.now(timezone.utc)
     raw_conn = db.connection().connection
     cursor = raw_conn.cursor()
 
     query = """
         UPDATE revenue_risk_cases AS r
-        SET recovery_probability = v.prob
-        FROM (VALUES %s) AS v(id, prob)
+        SET recovery_probability = v.prob,
+            last_scored_at = %(now)s
+        FROM (VALUES %%s) AS v(id, prob)
+        WHERE r.id = v.id
+    """ % {"now": "%(now)s"}
+
+    # execute_values doesn't support extra named params alongside VALUES
+    # cleanly, so we bind `now` into each row tuple instead.
+    updates_with_timestamp = [(case_id, prob, now) for case_id, prob in updates]
+
+    query = """
+        UPDATE revenue_risk_cases AS r
+        SET recovery_probability = v.prob,
+            last_scored_at = v.scored_at
+        FROM (VALUES %s) AS v(id, prob, scored_at)
         WHERE r.id = v.id
     """
 
     psycopg2.extras.execute_values(
         cursor,
         query,
-        updates,
-        template="(%s::uuid, %s::float)",
+        updates_with_timestamp,
+        template="(%s::uuid, %s::float, %s::timestamptz)",
         page_size=500,
     )
 
