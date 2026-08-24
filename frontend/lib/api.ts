@@ -100,3 +100,41 @@ export async function submitHumanDecision(
   });
   return res.data;
 }
+
+export interface ActionSummary {
+  id: string;
+  case_id: string;
+  customer_name: string;
+  action: string;
+  expected_value: number;
+  confidence: number;
+  policy_decision: string | null;
+  execution_status: string;
+  execution_mode: string | null;
+  created_at: string | null;
+}
+
+export interface EscalationSummary {
+  case_id: string;
+  customer_name: string;
+  scenario: string;
+  amount_at_risk: number;
+  recommended_action: string;
+  reason: string;
+  policy_reason: string;
+  confidence: number;
+  created_at: string | null;
+}
+
+export async function fetchActions(
+  merchantId: string,
+  filters?: { action_type?: string; policy_decision?: string; limit?: number; offset?: number }
+) {
+  const res = await apiClient.get(`/actions/${merchantId}`, { params: filters });
+  return res.data as { total_count: number; actions: ActionSummary[] };
+}
+
+export async function fetchEscalations(merchantId: string, limit = 50, offset = 0) {
+  const res = await apiClient.get(`/escalations/${merchantId}`, { params: { limit, offset } });
+  return res.data as { total_count: number; escalations: EscalationSummary[] };
+}
