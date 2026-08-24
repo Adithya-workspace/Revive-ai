@@ -3,12 +3,14 @@ REVIVE AI — Cases API routes (Phase 14 support)
 
 Read endpoints for the frontend: list cases (with filters, for the
 Revenue at Risk table) and get one case's full detail (for the case
-detail page, Section 26).
+detail page, Section 26). Also includes the human-in-the-loop decision
+endpoint (Section 15) for actions sitting at NEEDS_HUMAN.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional
+from pydantic import BaseModel
 
 from app.database import get_db
 from app.models import RevenueRiskCase, Diagnosis, RecoveryAction, ActionResult, Customer, AuditEvent
@@ -45,7 +47,6 @@ def list_cases(
         cust.id: cust for cust in db.query(Customer).filter(Customer.id.in_(customer_ids)).all()
     } if customer_ids else {}
 
-    # Latest diagnosis + action per case, for the recommended-action column
     diagnoses_by_case = {
         d.case_id: d for d in db.query(Diagnosis).filter(Diagnosis.case_id.in_(case_ids)).all()
     }
@@ -137,6 +138,7 @@ def get_case_detail(merchant_id: str, case_id: str, db: Session = Depends(get_db
         "policy": {
             "decision": action.policy_decision,
             "reason": action.policy_reason,
+            "needs_human_decision": action.policy_decision == "NEEDS_HUMAN",
         } if action and action.policy_decision else None,
         "action_result": {
             "mode": action_result.mode,
@@ -156,4 +158,62 @@ def get_case_detail(merchant_id: str, case_id: str, db: Session = Depends(get_db
             }
             for e in audit_events
         ],
+    }
+
+
+class HumanDecisionRequest(BaseModel):
+    decision: str
+    approver_note: str | None = None
+
+
+@router.post("/{merchant_id}/{case_id}/human-decision")
+def submit_human_decision(
+    merchant_id: str,
+    case_id: str,
+    body: HumanDecisionRequest,
+    db: Session = Depends(get_db),
+):
+    if body.decision not in ("APPROVED", "REJECTED"):
+        raise HTTPException(status_code=400, detail="decision must be APPROVED or REJECTED")
+
+    case = (
+        db.query(RevenueRiskCase)
+        .filter(RevenueRiskCase.id == case_id, RevenueRiskCase.merchant_id == merchant_id)
+        .first()
+    )
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    action = db.query(RecoveryAction).filter(RecoveryAction.case_id == case.id).first()
+    if not action:
+        raise HTTPException(status_code=404, detail="No recovery action found for this case")
+
+    if action.policy_decision != "NEEDS_HUMAN":
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"This action is at policy_decision='{action.policy_decision}', "
+                "not 'NEEDS_HUMAN' — nothing for a human to decide here."
+            ),
+        )
+
+    action.policy_decision = body.decision
+    note_suffix = f" — {body.approver_note}" if body.approver_note else ""
+    action.policy_reason = f"{action.policy_reason} | Human override: {body.decision}{note_suffix}"
+
+    audit_event = AuditEvent(
+        case_id=case.id,
+        event_type="HUMAN_DECISION_SUBMITTED",
+        actor="human:merchant_ops",
+        result=body.decision,
+        event_metadata={"approver_note": body.approver_note},
+    )
+    db.add(audit_event)
+
+    db.commit()
+
+    return {
+        "case_id": str(case.id),
+        "policy_decision": action.policy_decision,
+        "policy_reason": action.policy_reason,
     }

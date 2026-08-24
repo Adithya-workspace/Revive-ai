@@ -87,3 +87,16 @@ export async function fetchCaseDetail(merchantId: string, caseId: string) {
   const res = await apiClient.get(`/cases/${merchantId}/${caseId}`);
   return res.data;
 }
+
+export async function submitHumanDecision(
+  merchantId: string,
+  caseId: string,
+  decision: "APPROVED" | "REJECTED",
+  approverNote?: string
+) {
+  const res = await apiClient.post(`/cases/${merchantId}/${caseId}/human-decision`, {
+    decision,
+    approver_note: approverNote || null,
+  });
+  return res.data;
+}
