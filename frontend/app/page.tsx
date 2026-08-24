@@ -4,14 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMerchants, fetchAnalytics } from "@/lib/api";
 import { Card } from "@/components/ui/Card";
 import { PulseLoader } from "@/components/PulseLoader";
+import { formatCurrency } from "@/lib/format";
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
+
 
 function KpiCard({
   label,
