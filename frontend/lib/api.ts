@@ -138,3 +138,54 @@ export async function fetchEscalations(merchantId: string, limit = 50, offset = 
   const res = await apiClient.get(`/escalations/${merchantId}`, { params: { limit, offset } });
   return res.data as { total_count: number; escalations: EscalationSummary[] };
 }
+
+export interface CustomerSummary {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  case_count: number;
+  total_at_risk: number;
+  recovered: number;
+}
+
+export async function fetchCustomers(merchantId: string, limit = 100, offset = 0) {
+  const res = await apiClient.get(`/customers/${merchantId}`, { params: { limit, offset } });
+  return res.data as { total_count: number; customers: CustomerSummary[] };
+}
+
+export async function fetchCustomerDetail(merchantId: string, customerId: string) {
+  const res = await apiClient.get(`/customers/${merchantId}/${customerId}`);
+  return res.data;
+}
+
+export interface Policy {
+  key: string;
+  value: string;
+  description: string;
+  version: number;
+  updated_at: string | null;
+}
+
+export async function fetchPolicies() {
+  const res = await apiClient.get("/policies");
+  return res.data as Policy[];
+}
+
+export interface AuditEventItem {
+  id: string;
+  case_id: string;
+  event_type: string;
+  actor: string;
+  result: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string | null;
+}
+
+export async function fetchAuditEvents(
+  merchantId: string,
+  filters?: { event_type?: string; limit?: number; offset?: number }
+) {
+  const res = await apiClient.get(`/audit-events/${merchantId}`, { params: filters });
+  return res.data as { total_count: number; events: AuditEventItem[] };
+}
