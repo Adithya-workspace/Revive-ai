@@ -86,8 +86,8 @@ export default function RecoveryCasesPage() {
                     className="border-b border-border last:border-0 transition-colors duration-150 ease-out hover:bg-surface-raised"
                   >
                     <td className="px-5 py-3">
-                      <Link
-                        href={`/cases/${a.case_id}`}
+                    <Link
+                        href={`/cases/${a.case_id}?from=recovery-cases`}
                         className="font-mono text-xs text-accent hover:underline"
                       >
                         {shortId(a.case_id)}

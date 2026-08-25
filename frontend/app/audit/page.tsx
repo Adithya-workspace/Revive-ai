@@ -92,7 +92,7 @@ export default function AuditTrailPage() {
                   {e.result && <p className="text-xs text-text-muted mt-0.5">{e.result}</p>}
                 </div>
                 <Link
-                  href={`/cases/${e.case_id}`}
+                  href={`/cases/${e.case_id}?from=audit-trail`}
                   className="text-xs font-mono text-accent hover:underline shrink-0"
                 >
                   {shortId(e.case_id)}

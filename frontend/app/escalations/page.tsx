@@ -46,7 +46,7 @@ export default function EscalationsPage() {
             {data.total_count} case{data.total_count !== 1 ? "s" : ""} waiting on review
           </p>
           {data.escalations.map((e) => (
-            <Link key={e.case_id} href={`/cases/${e.case_id}`}>
+            <Link key={e.case_id} href={`/cases/${e.case_id}?from=escalations`}>
               <Card
                 hoverable
                 className="animate-fade-in-up flex items-center justify-between gap-4"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { fetchMerchants, fetchCaseDetail, submitHumanDecision } from "@/lib/api";
@@ -13,10 +13,22 @@ import { PulseLoader } from "@/components/PulseLoader";
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 
 
-export default function CaseDetailPage() {
+const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
+    "revenue-at-risk": { label: "Revenue at Risk", path: "/revenue-at-risk" },
+    "recovery-cases": { label: "Recovery Cases", path: "/cases" },
+    "actions": { label: "Actions", path: "/actions" },
+    "escalations": { label: "Escalations", path: "/escalations" },
+    "audit-trail": { label: "Audit Trail", path: "/audit" },
+  };
+  
+  export default function CaseDetailPage() {
     const params = useParams<{ id: string }>();
+    const searchParams = useSearchParams();
     const caseId = params.id as string;
     const queryClient = useQueryClient();
+  
+    const fromKey = searchParams.get("from") || "revenue-at-risk";
+    const backDestination = BACK_DESTINATIONS[fromKey] || BACK_DESTINATIONS["revenue-at-risk"];
   const [approverNote, setApproverNote] = useState("");
 
   const { data: merchants } = useQuery({
@@ -48,13 +60,13 @@ export default function CaseDetailPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div>
+        <div>
         <Link
-          href="/revenue-at-risk"
+          href={backDestination.path}
           className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text transition-colors duration-150"
         >
           <ArrowLeft size={14} />
-          Back to Revenue at Risk
+          Back to {backDestination.label}
         </Link>
       </div>
 

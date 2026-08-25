@@ -12,6 +12,7 @@ import { PulseLoader } from "@/components/PulseLoader";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+
 const SCENARIO_OPTIONS = [
   { value: "failed_payment", label: "Failed Payment" },
   { value: "checkout_abandonment", label: "Checkout Abandonment" },
@@ -132,8 +133,8 @@ export default function RevenueAtRiskPage() {
                     className="border-b border-border last:border-0 transition-colors duration-150 ease-out hover:bg-surface-raised"
                   >
                     <td className="px-5 py-3">
-                      <Link
-                        href={`/cases/${c.id}`}
+                    <Link
+                        href={`/cases/${c.id}?from=revenue-at-risk`}
                         className="font-mono text-xs text-accent hover:underline"
                       >
                         {shortId(c.id)}
