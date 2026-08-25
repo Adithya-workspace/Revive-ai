@@ -48,7 +48,7 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 13** — Analytics: real aggregate metrics computed directly from pipeline data — ₹3,05,81,527.55 total revenue at risk, ₹6,85,688.07 verified recovered (6.7% recovery rate on the currently-processed subset; rate will rise once the remaining 721-case diagnosis backlog clears), plus by-scenario and policy-decision breakdowns. No fabricated numbers — every figure traces to an actual query.
 - [x] **Phase 14** — Frontend dashboard complete: all nine screens built and verified against live data — Dashboard, Revenue at Risk, Case Detail (with human approve/reject), Recovery Cases, Escalations, Customers, Actions, Analytics (charts), Audit Trail (12,189 events), and Settings (live policy visibility). Design system: dark instrument-panel aesthetic with functional status-color system and "recovery pulse" signature motif.
 - [ ] **Phase 15** — Razorpay test-mode integration
-- [ ] **Phase 16** — Testing
+- [x] **Phase 16** — Testing: 37 automated tests passing (pytest, isolated `revive_test` database with per-test transaction rollback) — detection (all 3 scenarios + idempotency), policy engine (retry cap, amount ceiling, confidence floor, live-value verification), scoring, strategy, duplicate-action protection, and two required end-to-end pipeline tests (successful recovery path and safe-failure/escalation path).
 - [ ] **Phase 17** — Evaluation engine + baseline comparison
 - [ ] **Phase 18** — Demo mode
 - [ ] **Phase 19** — Polish
