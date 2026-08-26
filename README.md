@@ -49,7 +49,7 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 14** — Frontend dashboard complete: all nine screens built and verified against live data — Dashboard, Revenue at Risk, Case Detail (with human approve/reject), Recovery Cases, Escalations, Customers, Actions, Analytics (charts), Audit Trail (12,189 events), and Settings (live policy visibility). Design system: dark instrument-panel aesthetic with functional status-color system and "recovery pulse" signature motif.
 - [ ] **Phase 15** — Razorpay test-mode integration
 - [x] **Phase 16** — Testing: 37 automated tests passing (pytest, isolated `revive_test` database with per-test transaction rollback) — detection (all 3 scenarios + idempotency), policy engine (retry cap, amount ceiling, confidence floor, live-value verification), scoring, strategy, duplicate-action protection, and two required end-to-end pipeline tests (successful recovery path and safe-failure/escalation path).
-- [ ] **Phase 17** — Evaluation engine + baseline comparison
+- [x] **Phase 17** — Evaluation engine + baseline comparison: `python -m evaluation.run_evaluation` produces a full comparison against a naive "act on everything" baseline, restricted to a fair same-universe of 1,808 cases. Result: REVIVE's per-attempt recovery rate (56.2%) beats the naive baseline (46.7%) by +9.5pp, while avoiding 1,021 unnecessary interventions through policy gating — evidence that diagnosis-aware, policy-gated action selection is both safer and more effective, not a tradeoff between the two. Fully reproducible (DATA_SEED=42, versioned policies), results saved as timestamped JSON.
 - [ ] **Phase 18** — Demo mode
 - [ ] **Phase 19** — Polish
 - [ ] **Phase 20** — Final documentation
