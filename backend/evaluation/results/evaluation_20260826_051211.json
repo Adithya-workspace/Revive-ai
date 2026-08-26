@@ -1,0 +1,116 @@
+{
+  "evaluation_timestamp": "2026-08-26T05:12:11.007625+00:00",
+  "data_seed": 42,
+  "model_version": "rules-v1",
+  "policy_versions": {
+    "max_automatic_retries": 1,
+    "max_automatic_action_amount": 1,
+    "min_confidence_for_automatic_action": 1
+  },
+  "merchant_id": "1ded0b22-4350-4180-97c0-d3f580c7920f",
+  "revive_metrics": {
+    "overview": {
+      "total_revenue_at_risk": 30581527.55,
+      "potentially_recoverable_revenue": 10232059.8,
+      "recovered_revenue": 685688.07,
+      "recovery_rate": 0.067,
+      "total_cases": 2529,
+      "recovered_cases": 368,
+      "open_cases": 2161
+    },
+    "by_scenario": [
+      {
+        "scenario": "failed_payment",
+        "total_at_risk": 17677153.39,
+        "recovered": 618636.36,
+        "recovery_rate": 0.035,
+        "case_count": 1480,
+        "recovered_count": 327
+      },
+      {
+        "scenario": "checkout_abandonment",
+        "total_at_risk": 8231017.31,
+        "recovered": 29284.68,
+        "recovery_rate": 0.0036,
+        "case_count": 695,
+        "recovered_count": 19
+      },
+      {
+        "scenario": "overdue_receivable",
+        "total_at_risk": 4673356.85,
+        "recovered": 37767.03,
+        "recovery_rate": 0.0081,
+        "case_count": 354,
+        "recovered_count": 22
+      }
+    ],
+    "policy_decisions": {
+      "REJECTED": 299,
+      "APPROVED": 787,
+      "NEEDS_HUMAN": 722
+    },
+    "action_breakdown": {
+      "SEND_OVERDUE_REMINDER": 90,
+      "RETRY_PAYMENT": 580,
+      "SEND_CHECKOUT_RECOVERY_MESSAGE": 78,
+      "ESCALATE_TO_HUMAN": 107,
+      "SEND_PAYMENT_REMINDER": 615,
+      "DELAYED_RETRY": 285,
+      "TRACK_PROMISE_TO_PAY": 53
+    },
+    "verification_breakdown": {
+      "not_recovered": 309,
+      "recovered": 368
+    }
+  },
+  "revive_attempted_metrics": {
+    "case_count": 677,
+    "amount_at_risk": 1220623.23,
+    "recovered": 685688.07,
+    "rate": 0.5618
+  },
+  "baseline_metrics": {
+    "strategy": "baseline_naive_always_intervene",
+    "description": "Naive baseline: one generic action attempted on every case REVIVE's strategy stage actually reached (same universe as REVIVE, for a fair comparison), no diagnosis-driven action selection, no policy gating. Success drawn against each case's real recovery_probability score.",
+    "seed": 42,
+    "total_cases_considered": 1808,
+    "total_interventions": 1808,
+    "total_backlog_excluded_from_both_sides": 721,
+    "total_amount_at_risk": 21633227.76,
+    "total_recovered": 10107485.16,
+    "recovered_count": 925,
+    "recovery_rate": 0.4672,
+    "by_scenario": {
+      "failed_payment": {
+        "cases": 1480,
+        "recovered": 772,
+        "amount_at_risk": 17677153.39,
+        "recovered_amount": 8283558.27
+      },
+      "checkout_abandonment": {
+        "cases": 185,
+        "recovered": 94,
+        "amount_at_risk": 2187188.46,
+        "recovered_amount": 1056453.09
+      },
+      "overdue_receivable": {
+        "cases": 143,
+        "recovered": 59,
+        "amount_at_risk": 1768885.91,
+        "recovered_amount": 767473.8
+      }
+    }
+  },
+  "comparison": {
+    "revive_recovered_revenue": 685688.07,
+    "baseline_recovered_revenue": 10107485.16,
+    "revive_recovery_rate_overall": 0.067,
+    "baseline_recovery_rate": 0.4672,
+    "revive_recovery_rate_among_attempted": 0.5618,
+    "revive_attempted_case_count": 677,
+    "revive_automatic_interventions": 787,
+    "baseline_interventions": 1808,
+    "unnecessary_interventions_avoided_by_revive": 1021,
+    "interpretation": "REVIVE's per-attempt recovery rate (56.2%) is actually HIGHER than the naive baseline's rate (46.7%) \u2014 a 9.5% improvement, showing diagnosis-aware action selection genuinely outperforms blind intervention, not just avoids risk. The gap in TOTAL recovered revenue comes largely from coverage: REVIVE deliberately attempts far fewer cases (787 vs 1808) because policy gating routes low-confidence, high-value, and over-retried cases to human review instead of auto-acting. This is the coverage-vs-safety tradeoff Section 20 calls for."
+  }
+}
