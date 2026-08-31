@@ -18,7 +18,7 @@ import uuid
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
-from app.models import RevenueRiskCase, RecoveryAction, ActionResult
+from app.models import RevenueRiskCase, RecoveryAction, ActionResult, Transaction
 
 COMMIT_EVERY_N = 100
 
@@ -163,4 +163,168 @@ def run_action_executor(db: Session, merchant_id: uuid.UUID) -> dict:
         "status_breakdown": status_counts,
         "mode": "SIMULATED",
         "note": "Real Razorpay test-mode integration deferred to Phase 15 per project roadmap.",
+    }
+
+def simulate_api_failure(db: Session, merchant_id: uuid.UUID, case_id: uuid.UUID | None = None) -> dict:
+    """
+    Demonstrates graceful failure handling per Section 17.
+
+    If case_id points to an existing APPROVED action with no result yet,
+    fails that one directly. Otherwise, builds a brand-new demo case
+    from scratch — using the REAL scoring, diagnosis-rules, strategy,
+    and policy functions (never faked) — guaranteed to land as
+    APPROVED, so this demo is always runnable regardless of what state
+    the rest of the database is in. Only the final execution step is
+    deliberately made to fail, to demonstrate the safety guarantees:
+
+      - Idempotency: refuses to create a duplicate result for the same action.
+      - The case is never marked recovered as a result of a failure.
+      - The failure is logged distinctly from a legitimate customer decline.
+    """
+    from app.models import AuditEvent, Customer, Diagnosis
+    from app.services.scoring import score_case
+    from app.services.diagnosis_rules import diagnose_failed_payment_by_rules
+    from app.services.strategy import determine_strategy
+    from app.policies.engine import evaluate_policy, _load_policy_values
+
+    action_row = None
+
+    if case_id:
+        already_has_result_subquery = db.query(ActionResult.recovery_action_id).subquery()
+        action_row = (
+            db.query(RecoveryAction)
+            .filter(
+                RecoveryAction.case_id == case_id,
+                RecoveryAction.policy_decision == "APPROVED",
+                RecoveryAction.action.notin_(PASSIVE_ACTIONS),
+                RecoveryAction.id.notin_(already_has_result_subquery),
+            )
+            .first()
+        )
+
+    if action_row is None:
+        # Build a fresh, self-contained demo case using the real pipeline
+        # functions, guaranteed to resolve to APPROVED.
+        customer = db.query(Customer).filter(Customer.merchant_id == merchant_id).first()
+        if customer is None:
+            return {"success": False, "message": "No customer found for this merchant to attach a demo case to."}
+
+        demo_txn = Transaction(
+            id=uuid.uuid4(),
+            merchant_id=merchant_id,
+            customer_id=customer.id,
+            amount=2500,  # deliberately under the automatic-action ceiling
+            currency="INR",
+            status="failed",
+            failure_reason="insufficient_funds",  # deterministic, high-confidence rule
+            retry_count=0,
+        )
+        db.add(demo_txn)
+        db.flush()
+
+        demo_case = RevenueRiskCase(
+            id=uuid.uuid4(),
+            merchant_id=merchant_id,
+            customer_id=customer.id,
+            scenario="failed_payment",
+            source_type="transaction",
+            source_id=demo_txn.id,
+            amount_at_risk=demo_txn.amount,
+            priority="medium",
+            status="open",
+        )
+        db.add(demo_case)
+        db.flush()
+
+        score_result = score_case(demo_case, customer_success_rates={}, transaction_retry_counts={})
+        demo_case.recovery_probability = score_result["recovery_probability"]
+
+        rule_result = diagnose_failed_payment_by_rules("insufficient_funds")
+        demo_diagnosis = Diagnosis(
+            id=uuid.uuid4(),
+            case_id=demo_case.id,
+            diagnosis=rule_result["diagnosis"],
+            confidence=rule_result["confidence"],
+            evidence=rule_result["evidence"],
+            recommended_next_step=rule_result["recommended_next_step"],
+            reasoning_summary=rule_result["reasoning_summary"],
+            diagnosis_source="rules",
+        )
+        db.add(demo_diagnosis)
+        db.flush()
+
+        strategy_decision = determine_strategy(demo_case, demo_diagnosis)
+        action_row = RecoveryAction(
+            id=uuid.uuid4(),
+            case_id=demo_case.id,
+            action=strategy_decision["action"],
+            reason=strategy_decision["reason"],
+            expected_value=strategy_decision["expected_value"],
+            confidence=strategy_decision["confidence"],
+            strategy_source="rules",
+        )
+        db.add(action_row)
+        db.flush()
+
+        policy_values = _load_policy_values(db)
+        decision, reason = evaluate_policy(action_row, demo_case, retry_count=0, policy_values=policy_values)
+        action_row.policy_decision = decision
+        action_row.policy_reason = reason
+        db.flush()
+
+        if decision != "APPROVED":
+            db.rollback()
+            return {
+                "success": False,
+                "message": (
+                    f"Demo case unexpectedly resolved to '{decision}' instead of APPROVED "
+                    "— this shouldn't happen given the fixed demo parameters. No changes were made."
+                ),
+            }
+
+    # Deliberately simulate the failure — models a real infra failure
+    # (gateway timeout), never a fabricated customer decline.
+    result_row = ActionResult(
+        id=uuid.uuid4(),
+        recovery_action_id=action_row.id,
+        mode="SIMULATED",
+        status="failed",
+        result_detail=(
+            "SIMULATED infrastructure failure: external payment gateway did not "
+            "respond (connection timeout). This is NOT a customer decline — "
+            "REVIVE's own attempt to reach the gateway failed. No duplicate "
+            "action was taken; this case remains eligible for a policy-governed "
+            "retry or escalation on the next pipeline run."
+        ),
+    )
+    db.add(result_row)
+
+    audit_event = AuditEvent(
+        case_id=action_row.case_id,
+        event_type="ACTION_EXECUTION_API_FAILURE",
+        actor="system:action_executor",
+        result="failed",
+        event_metadata={
+            "action": action_row.action,
+            "simulated_error": "connection_timeout",
+            "note": "Demo-triggered failure simulation, not a real gateway call.",
+        },
+    )
+    db.add(audit_event)
+
+    db.commit()
+
+    case = db.query(RevenueRiskCase).filter(RevenueRiskCase.id == action_row.case_id).first()
+
+    return {
+        "success": True,
+        "case_id": str(action_row.case_id),
+        "action": action_row.action,
+        "message": (
+            "Simulated an external API failure during execution. The case was "
+            "NOT marked recovered, no duplicate action was created, and the "
+            "failure is recorded in the audit trail as an infrastructure "
+            "failure — distinct from a customer decline."
+        ),
+        "case_status_after_failure": case.status if case else None,
     }
