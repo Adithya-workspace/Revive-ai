@@ -189,3 +189,55 @@ export async function fetchAuditEvents(
   const res = await apiClient.get(`/audit-events/${merchantId}`, { params: filters });
   return res.data as { total_count: number; events: AuditEventItem[] };
 }
+
+export async function createDemoCase(merchantId: string) {
+  const res = await apiClient.post(`/demo/create-case/${merchantId}`);
+  return res.data;
+}
+
+export async function runDetectionScan(merchantId: string) {
+  const res = await apiClient.post(`/detection/run-scan/${merchantId}`);
+  return res.data;
+}
+
+export async function runScoring(merchantId: string) {
+  const res = await apiClient.post(`/scoring/run/${merchantId}`);
+  return res.data;
+}
+
+export async function runDiagnosis(merchantId: string, maxLlmCalls = 5) {
+  const res = await apiClient.post(`/diagnosis/run/${merchantId}`, null, {
+    params: { max_llm_calls: maxLlmCalls },
+  });
+  return res.data;
+}
+
+export async function runStrategy(merchantId: string) {
+  const res = await apiClient.post(`/strategy/run/${merchantId}`);
+  return res.data;
+}
+
+export async function runPolicyEngine(merchantId: string) {
+  const res = await apiClient.post(`/policy/run/${merchantId}`);
+  return res.data;
+}
+
+export async function runActionExecutor(merchantId: string) {
+  const res = await apiClient.post(`/actions/run/${merchantId}`);
+  return res.data;
+}
+
+export async function runVerification(merchantId: string) {
+  const res = await apiClient.post(`/verification/run/${merchantId}`);
+  return res.data;
+}
+
+export async function simulateApiFailure(merchantId: string) {
+  const res = await apiClient.post(`/actions/simulate-api-failure/${merchantId}`, {});
+  return res.data;
+}
+
+export async function runLiveEvaluation(merchantId: string) {
+  const res = await apiClient.post(`/demo/run-evaluation/${merchantId}`);
+  return res.data;
+}

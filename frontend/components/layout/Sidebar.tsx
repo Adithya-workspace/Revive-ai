@@ -12,10 +12,12 @@ import {
   BarChart3,
   ScrollText,
   Settings,
+  PlayCircle,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/demo", label: "Demo Mode", icon: PlayCircle },
   { href: "/revenue-at-risk", label: "Revenue at Risk", icon: AlertTriangle },
   { href: "/cases", label: "Recovery Cases", icon: FolderKanban },
   { href: "/customers", label: "Customers", icon: Users },
