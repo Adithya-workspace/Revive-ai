@@ -241,3 +241,8 @@ export async function runLiveEvaluation(merchantId: string) {
   const res = await apiClient.post(`/demo/run-evaluation/${merchantId}`);
   return res.data;
 }
+
+export async function resetDemoData(merchantId: string) {
+  const res = await apiClient.post(`/demo/reset/${merchantId}`);
+  return res.data;
+}

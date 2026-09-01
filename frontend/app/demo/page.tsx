@@ -19,6 +19,7 @@ import { DemoStep } from "@/components/DemoStep";
 import { Card } from "@/components/ui/Card";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { ArrowRight, ExternalLink } from "lucide-react";
+import { resetDemoData } from "@/lib/api";
 
 export default function DemoModePage() {
   const { data: merchants } = useQuery({
@@ -49,6 +50,15 @@ export default function DemoModePage() {
           it directly would show &quot;0 new&quot; every time.
         </p>
       </Card>
+
+      <DemoStep
+        stepNumber={0}
+        title="Reset demo data (optional)"
+        description="Removes every case this Demo Mode walkthrough has created, restoring your official evaluation numbers exactly as they were. Safe to run before or after practicing."
+        buttonLabel="Reset Demo Data"
+        onRun={() => resetDemoData(merchantId)}
+        formatResult={(r) => r.message}
+      />
 
       <DemoStep
         stepNumber={1}

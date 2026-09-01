@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen bg-ink">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar merchantName={merchant?.name} />
+      <TopBar merchantName={merchant?.name} merchantId={merchant?.id} />
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
