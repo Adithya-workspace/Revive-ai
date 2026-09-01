@@ -5,6 +5,7 @@ import { fetchMerchants, fetchCustomers } from "@/lib/api";
 import { formatCurrency } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 export default function CustomersPage() {
   const { data: merchants } = useQuery({
@@ -13,7 +14,7 @@ export default function CustomersPage() {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["customers", merchantId],
     queryFn: () => fetchCustomers(merchantId!, 100),
     enabled: !!merchantId,
@@ -29,8 +30,10 @@ export default function CustomersPage() {
       </div>
 
       <Card className="p-0 overflow-hidden">
-        {isLoading ? (
+      {isLoading ? (
           <PulseLoader label="Loading customers..." />
+        ) : isError ? (
+          <ErrorState message="Couldn't load customers." />
         ) : !data || data.customers.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-sm text-text-muted">No customers found.</p>

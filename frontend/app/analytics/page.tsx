@@ -5,6 +5,7 @@ import { fetchMerchants, fetchAnalytics } from "@/lib/api";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 import {
   BarChart,
   Bar,
@@ -32,14 +33,18 @@ export default function AnalyticsPage() {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["analytics-page", merchantId],
     queryFn: () => fetchAnalytics(merchantId!),
     enabled: !!merchantId,
   });
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return <PulseLoader label="Loading analytics..." />;
+  }
+
+  if (isError || !data) {
+    return <ErrorState message="Couldn't load analytics." />;
   }
 
   const scenarioChartData = data.by_scenario.map((s) => ({

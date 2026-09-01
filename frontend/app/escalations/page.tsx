@@ -6,6 +6,7 @@ import { fetchMerchants, fetchEscalations } from "@/lib/api";
 import { formatCurrency, formatPercent, formatDate, shortId } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { ShieldAlert, ArrowRight } from "lucide-react";
 
 export default function EscalationsPage() {
@@ -15,7 +16,7 @@ export default function EscalationsPage() {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["escalations", merchantId],
     queryFn: () => fetchEscalations(merchantId!, 100),
     enabled: !!merchantId,
@@ -32,6 +33,8 @@ export default function EscalationsPage() {
 
       {isLoading ? (
         <PulseLoader label="Loading escalations..." />
+      ) : isError ? (
+        <ErrorState message="Couldn't load escalations." />
       ) : !data || data.escalations.length === 0 ? (
         <Card className="py-16 text-center">
           <ShieldAlert size={28} className="mx-auto text-text-faint mb-3" />

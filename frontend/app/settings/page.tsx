@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPolicies, fetchMerchants } from "@/lib/api";
 import { Card } from "@/components/ui/Card";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { ShieldCheck } from "lucide-react";
 
 export default function SettingsPage() {
@@ -12,7 +13,7 @@ export default function SettingsPage() {
     queryFn: fetchMerchants,
   });
 
-  const { data: policies, isLoading } = useQuery({
+  const { data: policies, isLoading, isError } = useQuery({
     queryKey: ["policies"],
     queryFn: fetchPolicies,
   });
@@ -54,6 +55,8 @@ export default function SettingsPage() {
 
         {isLoading ? (
           <PulseLoader label="Loading policies..." />
+        ) : isError ? (
+          <ErrorState message="Couldn't load policy configuration." />
         ) : !policies || policies.length === 0 ? (
           <p className="text-sm text-text-faint">No policies configured.</p>
         ) : (

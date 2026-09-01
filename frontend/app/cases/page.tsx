@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 const POLICY_OPTIONS = [
   { value: "APPROVED", label: "Approved" },
@@ -25,7 +26,7 @@ export default function RecoveryCasesPage() {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["actions", merchantId, policyDecision],
     queryFn: () =>
       fetchActions(merchantId!, {
@@ -61,6 +62,8 @@ export default function RecoveryCasesPage() {
       <Card className="p-0 overflow-hidden">
         {isLoading ? (
           <PulseLoader label="Loading recovery cases..." />
+        ) : isError ? (
+          <ErrorState message="Couldn't load recovery cases." />
         ) : !data || data.actions.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-sm text-text-muted">No cases match this filter.</p>

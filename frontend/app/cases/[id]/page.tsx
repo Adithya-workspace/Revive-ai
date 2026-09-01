@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 
 
@@ -37,7 +38,7 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["case-detail", merchantId, caseId],
     queryFn: () => fetchCaseDetail(merchantId!, caseId),
     enabled: !!merchantId,
@@ -52,8 +53,12 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
     },
   });
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return <PulseLoader label="Loading case..." />;
+  }
+
+  if (isError || !data) {
+    return <ErrorState message="Couldn't load this case." />;
   }
 
   const { case: c, customer, diagnosis, strategy, policy, action_result, audit_trail } = data;

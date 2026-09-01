@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -46,7 +47,7 @@ export default function RevenueAtRiskPage() {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError } = useQuery({
     queryKey: ["cases", merchantId, scenario, priority, status, page],
     queryFn: () =>
       fetchCases(merchantId!, {
@@ -104,8 +105,10 @@ export default function RevenueAtRiskPage() {
       </div>
 
       <Card className="p-0 overflow-hidden">
-        {isLoading ? (
+      {isLoading ? (
           <PulseLoader label="Loading cases..." />
+        ) : isError ? (
+          <ErrorState message="Couldn't load cases." />
         ) : !data || data.cases.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-sm text-text-muted">No cases match these filters.</p>

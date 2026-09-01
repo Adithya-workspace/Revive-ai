@@ -8,6 +8,7 @@ import { formatDate, shortId } from "@/lib/format";
 import { Card } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 const EVENT_TYPE_OPTIONS = [
   { value: "CASE_DETECTED", label: "Case Detected" },
@@ -30,7 +31,7 @@ export default function AuditTrailPage() {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["audit-events", merchantId, eventType],
     queryFn: () =>
       fetchAuditEvents(merchantId!, { event_type: eventType || undefined, limit: 100 }),
@@ -63,6 +64,8 @@ export default function AuditTrailPage() {
       <Card className="p-0 overflow-hidden">
         {isLoading ? (
           <PulseLoader label="Loading audit trail..." />
+        ) : isError ? (
+          <ErrorState message="Couldn't load the audit trail." />
         ) : !data || data.events.length === 0 ? (
           <div className="py-16 text-center space-y-2">
             <p className="text-sm text-text-muted">No audit events recorded yet.</p>

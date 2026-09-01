@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 
 const ACTION_OPTIONS = [
   { value: "RETRY_PAYMENT", label: "Retry Payment" },
@@ -30,7 +31,7 @@ export default function ActionsPage() {
   });
   const merchantId = merchants?.[0]?.id;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["actions-page", merchantId, actionType],
     queryFn: () =>
       fetchActions(merchantId!, { action_type: actionType || undefined, limit: 100 }),
@@ -63,6 +64,8 @@ export default function ActionsPage() {
       <Card className="p-0 overflow-hidden">
         {isLoading ? (
           <PulseLoader label="Loading actions..." />
+        ) : isError ? (
+          <ErrorState message="Couldn't load actions." />
         ) : !data || data.actions.length === 0 ? (
           <div className="py-16 text-center">
             <p className="text-sm text-text-muted">No actions match this filter.</p>
