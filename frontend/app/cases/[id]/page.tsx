@@ -13,24 +13,23 @@ import { PulseLoader } from "@/components/PulseLoader";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 
-
 const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
-    "revenue-at-risk": { label: "Revenue at Risk", path: "/revenue-at-risk" },
-    "recovery-cases": { label: "Recovery Cases", path: "/cases" },
-    "actions": { label: "Actions", path: "/actions" },
-    "escalations": { label: "Escalations", path: "/escalations" },
-    "audit-trail": { label: "Audit Trail", path: "/audit" },
-  };
-  
-  export default function CaseDetailPage() {
-    const params = useParams<{ id: string }>();
-    const searchParams = useSearchParams();
-    const caseId = params.id as string;
-    const queryClient = useQueryClient();
-  
-    const fromKey = searchParams.get("from") || "revenue-at-risk";
-    const backDestination = BACK_DESTINATIONS[fromKey] || BACK_DESTINATIONS["revenue-at-risk"];
+  "revenue-at-risk": { label: "Revenue at Risk", path: "/revenue-at-risk" },
+  "recovery-cases": { label: "Recovery Cases", path: "/cases" },
+  "actions": { label: "Actions", path: "/actions" },
+  "escalations": { label: "Escalations", path: "/escalations" },
+  "audit-trail": { label: "Audit Trail", path: "/audit" },
+};
+
+export default function CaseDetailPage() {
+  const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const caseId = params.id as string;
+  const queryClient = useQueryClient();
   const [approverNote, setApproverNote] = useState("");
+
+  const fromKey = searchParams.get("from") || "revenue-at-risk";
+  const backDestination = BACK_DESTINATIONS[fromKey] || BACK_DESTINATIONS["revenue-at-risk"];
 
   const { data: merchants } = useQuery({
     queryKey: ["merchants"],
@@ -65,7 +64,7 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
 
   return (
     <div className="space-y-6 max-w-5xl">
-        <div>
+      <div>
         <Link
           href={backDestination.path}
           className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text transition-colors duration-150"
@@ -75,9 +74,9 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
         </Link>
       </div>
 
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h1 className="font-display text-2xl font-semibold text-text">
               Case {shortId(c.id)}
             </h1>
@@ -87,7 +86,7 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
             {c.scenario.replace(/_/g, " ")} · Detected {formatDate(c.created_at)}
           </p>
         </div>
-        <div className="text-right">
+        <div className="text-left sm:text-right">
           <p className="font-mono tabular-nums text-2xl font-semibold text-text">
             {formatCurrency(c.amount_at_risk)}
           </p>
@@ -116,7 +115,7 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
               onChange={(e) => setApproverNote(e.target.value)}
               className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-faint focus:border-accent transition-colors duration-150"
             />
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Button
                 variant="primary"
                 onClick={() => decisionMutation.mutate("APPROVED")}
@@ -139,13 +138,13 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
           <h2 className="font-display text-sm font-semibold text-text mb-3">Customer</h2>
           {customer ? (
             <div className="space-y-1 text-sm">
               <p className="text-text">{customer.name}</p>
-              <p className="text-text-muted">{customer.email}</p>
+              <p className="text-text-muted break-all">{customer.email}</p>
               <p className="text-text-muted">{customer.phone}</p>
             </div>
           ) : (
@@ -157,7 +156,7 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
           <h2 className="font-display text-sm font-semibold text-text mb-3">Action Result</h2>
           {action_result ? (
             <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs px-2 py-0.5 rounded bg-surface-raised text-text-muted font-mono">
                   {action_result.mode}
                 </span>
@@ -180,9 +179,9 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
         <h2 className="font-display text-sm font-semibold text-text mb-3">Diagnosis</h2>
         {diagnosis ? (
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <p className="text-sm text-text">{diagnosis.diagnosis}</p>
-              <span className="text-xs px-2 py-0.5 rounded bg-surface-raised text-text-muted font-mono">
+              <span className="text-xs px-2 py-0.5 rounded bg-surface-raised text-text-muted font-mono w-fit">
                 {diagnosis.diagnosis_source} · {formatPercent(diagnosis.confidence)}
               </span>
             </div>
@@ -208,7 +207,7 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
         </h2>
         {strategy ? (
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <p className="text-sm text-text font-medium">
                 {strategy.action.replace(/_/g, " ")}
               </p>
@@ -218,7 +217,7 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
             </div>
             <p className="text-sm text-text-muted">{strategy.reason}</p>
             {policy && (
-              <div className="pt-3 border-t border-border flex items-start gap-3">
+              <div className="pt-3 border-t border-border flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3">
                 <StatusBadge value={policy.decision} />
                 <p className="text-xs text-text-faint">{policy.reason}</p>
               </div>
@@ -234,8 +233,8 @@ const BACK_DESTINATIONS: Record<string, { label: string; path: string }> = {
         {audit_trail.length > 0 ? (
           <div className="space-y-3">
             {audit_trail.map((e: any, i: number) => (
-              <div key={i} className="flex gap-3 text-sm">
-                <p className="text-text-faint text-xs font-mono w-32 shrink-0 pt-0.5">
+              <div key={i} className="flex flex-col sm:flex-row gap-1 sm:gap-3 text-sm">
+                <p className="text-text-faint text-xs font-mono sm:w-32 shrink-0 pt-0.5">
                   {formatDate(e.created_at)}
                 </p>
                 <div>

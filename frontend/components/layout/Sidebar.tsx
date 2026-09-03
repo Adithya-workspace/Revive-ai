@@ -28,11 +28,11 @@ const NAV_ITEMS = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-60 shrink-0 border-r border-border bg-surface flex flex-col h-screen sticky top-0">
+    <aside className="w-64 sm:w-60 h-screen border-r border-border bg-surface flex flex-col overflow-y-auto">
       <div className="px-5 py-6 border-b border-border">
         <div className="flex items-center gap-2">
           <svg width="22" height="22" viewBox="0 0 22 22" className="text-accent">
@@ -52,7 +52,7 @@ export function Sidebar() {
         <p className="text-[11px] text-text-faint mt-1 pl-[30px]">Revenue Recovery</p>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -61,6 +61,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ease-out ${
                 isActive
                   ? "bg-accent-dim text-accent"
@@ -80,9 +81,7 @@ export function Sidebar() {
       </nav>
 
       <div className="px-5 py-4 border-t border-border">
-        <p className="text-[11px] text-text-faint">
-          TEST MODE
-        </p>
+        <p className="text-[11px] text-text-faint">TEST MODE</p>
       </div>
     </aside>
   );

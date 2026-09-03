@@ -77,19 +77,20 @@ export default function AnalyticsPage() {
           Revenue at Risk vs Recovered, by Scenario
         </h2>
         <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={scenarioChartData}>
+          <BarChart data={scenarioChartData} margin={{ left: -10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#232b33" vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fill: "#8a96a3", fontSize: 12 }}
+              tick={{ fill: "#8a96a3", fontSize: 11 }}
               axisLine={{ stroke: "#232b33" }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: "#8a96a3", fontSize: 12 }}
+              tick={{ fill: "#8a96a3", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v) => `₹${(v / 100000).toFixed(0)}L`}
+              width={50}
             />
             <Tooltip
               contentStyle={{
@@ -106,7 +107,7 @@ export default function AnalyticsPage() {
         </ResponsiveContainer>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
           <h2 className="font-display text-sm font-semibold text-text mb-4">
             Policy Decisions
@@ -149,21 +150,21 @@ export default function AnalyticsPage() {
             Actions by Type
           </h2>
           <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={actionChartData} layout="vertical" margin={{ left: 20 }}>
+            <BarChart data={actionChartData} layout="vertical" margin={{ left: 10, right: 10 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#232b33" horizontal={false} />
               <XAxis
                 type="number"
-                tick={{ fill: "#8a96a3", fontSize: 11 }}
+                tick={{ fill: "#8a96a3", fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
                 type="category"
                 dataKey="name"
-                tick={{ fill: "#8a96a3", fontSize: 11 }}
+                tick={{ fill: "#8a96a3", fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
-                width={140}
+                width={110}
               />
               <Tooltip
                 contentStyle={{
@@ -183,7 +184,7 @@ export default function AnalyticsPage() {
         <h2 className="font-display text-sm font-semibold text-text mb-4">
           Verification Outcomes
         </h2>
-        <div className="flex gap-8">
+        <div className="flex flex-wrap gap-6 sm:gap-8">
           {Object.entries(data.verification_breakdown).map(([outcome, count]) => (
             <div key={outcome}>
               <p className="font-mono tabular-nums text-2xl font-semibold text-text">

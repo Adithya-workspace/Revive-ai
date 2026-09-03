@@ -80,13 +80,13 @@ export default function AuditTrailPage() {
             {data.events.map((e) => (
               <div
                 key={e.id}
-                className="px-5 py-3 flex items-start gap-4 transition-colors duration-150 ease-out hover:bg-surface-raised"
+                className="px-4 sm:px-5 py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 transition-colors duration-150 ease-out hover:bg-surface-raised"
               >
-                <p className="text-xs font-mono text-text-faint w-40 shrink-0 pt-0.5">
+                <p className="text-xs font-mono text-text-faint sm:w-40 shrink-0 pt-0.5">
                   {formatDate(e.created_at)}
                 </p>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm text-text font-medium">
                       {e.event_type.replace(/_/g, " ")}
                     </p>

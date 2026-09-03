@@ -4,9 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMerchants, fetchAnalytics } from "@/lib/api";
 import { Card } from "@/components/ui/Card";
 import { PulseLoader } from "@/components/PulseLoader";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { formatCurrency } from "@/lib/format";
-
-
 
 function KpiCard({
   label,
@@ -29,7 +28,7 @@ function KpiCard({
   return (
     <Card className="animate-fade-in-up">
       <p className="text-xs font-medium text-text-muted uppercase tracking-wide">{label}</p>
-      <p className={`font-mono tabular-nums text-2xl font-semibold mt-2 ${accentClass}`}>
+      <p className={`font-mono tabular-nums text-xl sm:text-2xl font-semibold mt-2 ${accentClass} truncate`}>
         {value}
       </p>
       {sublabel && <p className="text-xs text-text-faint mt-1">{sublabel}</p>}
@@ -45,14 +44,18 @@ export default function DashboardPage() {
 
   const merchantId = merchants?.[0]?.id;
 
-  const { data: analytics, isLoading } = useQuery({
+  const { data: analytics, isLoading, isError } = useQuery({
     queryKey: ["analytics", merchantId],
     queryFn: () => fetchAnalytics(merchantId!),
     enabled: !!merchantId,
   });
 
-  if (isLoading || !analytics) {
+  if (isLoading) {
     return <PulseLoader label="Loading dashboard..." />;
+  }
+
+  if (isError || !analytics) {
+    return <ErrorState message="Couldn't load the dashboard." />;
   }
 
   const { overview, by_scenario, policy_decisions } = analytics;
@@ -66,7 +69,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           label="Revenue at Risk"
           value={formatCurrency(overview.total_revenue_at_risk)}
@@ -92,21 +95,21 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
           <h2 className="font-display text-sm font-semibold text-text mb-4">By Scenario</h2>
           <div className="space-y-3">
             {by_scenario.map((s) => (
-              <div key={s.scenario} className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-text capitalize">
+              <div key={s.scenario} className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm text-text capitalize truncate">
                     {s.scenario.replace(/_/g, " ")}
                   </p>
                   <p className="text-xs text-text-faint">
                     {s.recovered_count} / {s.case_count} recovered
                   </p>
                 </div>
-                <p className="font-mono tabular-nums text-sm text-recovered">
+                <p className="font-mono tabular-nums text-sm text-recovered shrink-0">
                   {(s.recovery_rate * 100).toFixed(1)}%
                 </p>
               </div>
@@ -118,9 +121,9 @@ export default function DashboardPage() {
           <h2 className="font-display text-sm font-semibold text-text mb-4">Policy Decisions</h2>
           <div className="space-y-3">
             {Object.entries(policy_decisions).map(([decision, count]) => (
-              <div key={decision} className="flex items-center justify-between">
-                <p className="text-sm text-text-muted">{decision.replace(/_/g, " ")}</p>
-                <p className="font-mono tabular-nums text-sm text-text">{count}</p>
+              <div key={decision} className="flex items-center justify-between gap-3">
+                <p className="text-sm text-text-muted truncate">{decision.replace(/_/g, " ")}</p>
+                <p className="font-mono tabular-nums text-sm text-text shrink-0">{count}</p>
               </div>
             ))}
           </div>

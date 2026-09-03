@@ -52,10 +52,10 @@ export default function EscalationsPage() {
             <Link key={e.case_id} href={`/cases/${e.case_id}?from=escalations`}>
               <Card
                 hoverable
-                className="animate-fade-in-up flex items-center justify-between gap-4"
+                className="animate-fade-in-up flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-xs text-accent">
                       {shortId(e.case_id)}
                     </span>
@@ -72,7 +72,7 @@ export default function EscalationsPage() {
                     {formatPercent(e.confidence)} confidence
                   </p>
                 </div>
-                <div className="flex items-center gap-4 shrink-0">
+                <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0">
                   <p className="font-mono tabular-nums text-lg font-semibold text-at-risk">
                     {formatCurrency(e.amount_at_risk || 0)}
                   </p>

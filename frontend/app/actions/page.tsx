@@ -71,17 +71,17 @@ export default function ActionsPage() {
             <p className="text-sm text-text-muted">No actions match this filter.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto -mx-5 sm:mx-0 px-5 sm:px-0">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs font-medium text-text-faint uppercase tracking-wide">
-                  <th className="px-5 py-3">Case</th>
-                  <th className="px-5 py-3">Customer</th>
-                  <th className="px-5 py-3">Action</th>
-                  <th className="px-5 py-3 text-right">Confidence</th>
-                  <th className="px-5 py-3">Mode</th>
-                  <th className="px-5 py-3">Result</th>
-                  <th className="px-5 py-3">Created</th>
+                  <th className="px-3 sm:px-5 py-3">Case</th>
+                  <th className="px-3 sm:px-5 py-3">Customer</th>
+                  <th className="px-3 sm:px-5 py-3">Action</th>
+                  <th className="hidden sm:table-cell px-3 sm:px-5 py-3 text-right">Confidence</th>
+                  <th className="hidden md:table-cell px-3 sm:px-5 py-3">Mode</th>
+                  <th className="px-3 sm:px-5 py-3">Result</th>
+                  <th className="hidden lg:table-cell px-3 sm:px-5 py-3">Created</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,22 +90,22 @@ export default function ActionsPage() {
                     key={a.id}
                     className="border-b border-border last:border-0 transition-colors duration-150 ease-out hover:bg-surface-raised"
                   >
-                    <td className="px-5 py-3">
-                    <Link
+                    <td className="px-3 sm:px-5 py-3">
+                      <Link
                         href={`/cases/${a.case_id}?from=actions`}
                         className="font-mono text-xs text-accent hover:underline"
                       >
                         {shortId(a.case_id)}
                       </Link>
                     </td>
-                    <td className="px-5 py-3 text-text">{a.customer_name}</td>
-                    <td className="px-5 py-3 text-text-muted text-xs">
+                    <td className="px-3 sm:px-5 py-3 text-text whitespace-nowrap">{a.customer_name}</td>
+                    <td className="px-3 sm:px-5 py-3 text-text-muted text-xs whitespace-nowrap">
                       {a.action.replace(/_/g, " ")}
                     </td>
-                    <td className="px-5 py-3 text-right font-mono tabular-nums text-text-muted">
+                    <td className="hidden sm:table-cell px-3 sm:px-5 py-3 text-right font-mono tabular-nums text-text-muted">
                       {formatPercent(a.confidence)}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="hidden md:table-cell px-3 sm:px-5 py-3">
                       {a.execution_mode ? (
                         <span className="text-xs px-2 py-0.5 rounded bg-surface-raised text-text-muted font-mono">
                           {a.execution_mode}
@@ -114,10 +114,10 @@ export default function ActionsPage() {
                         <span className="text-xs text-text-faint">—</span>
                       )}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="px-3 sm:px-5 py-3">
                       <StatusBadge value={a.execution_status} />
                     </td>
-                    <td className="px-5 py-3 text-text-faint text-xs">
+                    <td className="hidden lg:table-cell px-3 sm:px-5 py-3 text-text-faint text-xs whitespace-nowrap">
                       {formatDate(a.created_at)}
                     </td>
                   </tr>

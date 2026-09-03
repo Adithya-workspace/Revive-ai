@@ -105,7 +105,7 @@ export default function RevenueAtRiskPage() {
       </div>
 
       <Card className="p-0 overflow-hidden">
-      {isLoading ? (
+        {isLoading ? (
           <PulseLoader label="Loading cases..." />
         ) : isError ? (
           <ErrorState message="Couldn't load cases." />
@@ -117,16 +117,16 @@ export default function RevenueAtRiskPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border text-left text-xs font-medium text-text-faint uppercase tracking-wide">
-                  <th className="px-5 py-3">Case</th>
-                  <th className="px-5 py-3">Customer</th>
-                  <th className="px-5 py-3">Type</th>
-                  <th className="px-5 py-3 text-right">Amount at Risk</th>
-                  <th className="px-5 py-3 text-right">Recovery Prob.</th>
-                  <th className="px-5 py-3">Priority</th>
-                  <th className="px-5 py-3">Recommended Action</th>
-                  <th className="px-5 py-3">Status</th>
-                  <th className="px-5 py-3">Detected</th>
+              <tr className="border-b border-border text-left text-xs font-medium text-text-faint uppercase tracking-wide">
+                  <th className="px-3 sm:px-5 py-3">Case</th>
+                  <th className="px-3 sm:px-5 py-3">Customer</th>
+                  <th className="hidden md:table-cell px-3 sm:px-5 py-3">Type</th>
+                  <th className="px-3 sm:px-5 py-3 text-right">Amount</th>
+                  <th className="hidden lg:table-cell px-3 sm:px-5 py-3 text-right">Recovery Prob.</th>
+                  <th className="hidden sm:table-cell px-3 sm:px-5 py-3">Priority</th>
+                  <th className="hidden lg:table-cell px-3 sm:px-5 py-3">Recommended Action</th>
+                  <th className="px-3 sm:px-5 py-3">Status</th>
+                  <th className="hidden md:table-cell px-3 sm:px-5 py-3">Detected</th>
                 </tr>
               </thead>
               <tbody>
@@ -135,36 +135,36 @@ export default function RevenueAtRiskPage() {
                     key={c.id}
                     className="border-b border-border last:border-0 transition-colors duration-150 ease-out hover:bg-surface-raised"
                   >
-                    <td className="px-5 py-3">
-                    <Link
+                                        <td className="px-3 sm:px-5 py-3">
+                      <Link
                         href={`/cases/${c.id}?from=revenue-at-risk`}
                         className="font-mono text-xs text-accent hover:underline"
                       >
                         {shortId(c.id)}
                       </Link>
                     </td>
-                    <td className="px-5 py-3 text-text">{c.customer_name}</td>
-                    <td className="px-5 py-3 text-text-muted capitalize">
+                    <td className="px-3 sm:px-5 py-3 text-text whitespace-nowrap">{c.customer_name}</td>
+                    <td className="hidden md:table-cell px-3 sm:px-5 py-3 text-text-muted capitalize whitespace-nowrap">
                       {c.scenario.replace(/_/g, " ")}
                     </td>
-                    <td className="px-5 py-3 text-right font-mono tabular-nums text-text">
+                    <td className="px-3 sm:px-5 py-3 text-right font-mono tabular-nums text-text whitespace-nowrap">
                       {formatCurrency(c.amount_at_risk)}
                     </td>
-                    <td className="px-5 py-3 text-right font-mono tabular-nums text-text-muted">
+                    <td className="hidden lg:table-cell px-3 sm:px-5 py-3 text-right font-mono tabular-nums text-text-muted">
                       {c.recovery_probability !== null
                         ? formatPercent(c.recovery_probability)
                         : "—"}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="hidden sm:table-cell px-3 sm:px-5 py-3">
                       <StatusBadge value={c.priority} />
                     </td>
-                    <td className="px-5 py-3 text-text-muted text-xs">
+                    <td className="hidden lg:table-cell px-3 sm:px-5 py-3 text-text-muted text-xs whitespace-nowrap">
                       {c.recommended_action ? c.recommended_action.replace(/_/g, " ") : "Not yet strategized"}
                     </td>
-                    <td className="px-5 py-3">
+                    <td className="px-3 sm:px-5 py-3">
                       <StatusBadge value={c.status} />
                     </td>
-                    <td className="px-5 py-3 text-text-faint text-xs">
+                    <td className="hidden md:table-cell px-3 sm:px-5 py-3 text-text-faint text-xs whitespace-nowrap">
                       {formatDate(c.created_at)}
                     </td>
                   </tr>
