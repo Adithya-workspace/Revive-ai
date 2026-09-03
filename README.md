@@ -15,6 +15,20 @@ This is not an LLM that gives merchants advice. It's a controlled agent system w
 
 ---
 
+## Results
+
+Measured against the full 2,529-case synthetic dataset (seed=42, fully reproducible — see `docs/EVALUATION.md`):
+
+| | REVIVE | Naive baseline |
+|---|---|---|
+| Recovered revenue | ₹8,92,167.88 | ₹1,14,24,698 |
+| Recovery rate (per attempt) | **52.7%** | 47.4% |
+| Automatic interventions | 1,259 | 2,529 |
+
+REVIVE recovers money more effectively *per attempt* than a naive "act on everything" strategy, while automatically avoiding **1,270 unnecessary interventions** by routing low-confidence, high-value, and over-retried cases to human review instead. Full methodology, including why this comparison is fair, in [`docs/EVALUATION.md`](docs/EVALUATION.md).
+
+---
+
 ## Architecture
 
 Full architecture, agent workflow, and data model are documented in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -47,12 +61,12 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 12** — Audit trail: schema and backfill logic built (CASE_DETECTED → RECOVERY_SCORE_CALCULATED → DIAGNOSIS_COMPLETED → STRATEGY_SELECTED → POLICY_DECISION → ACTION_EXECUTED → VERIFICATION_COMPLETED → CASE_RECOVERED), with a timestamp-ordering fix applied. Backfill run itself deferred — table is currently empty and needs `python -m scripts.backfill_audit_trail` before demo/evaluation.
 - [x] **Phase 13** — Analytics: real aggregate metrics computed directly from pipeline data — ₹3,05,81,527.55 total revenue at risk, ₹6,85,688.07 verified recovered (6.7% recovery rate on the currently-processed subset; rate will rise once the remaining 721-case diagnosis backlog clears), plus by-scenario and policy-decision breakdowns. No fabricated numbers — every figure traces to an actual query.
 - [x] **Phase 14** — Frontend dashboard complete: all nine screens built and verified against live data — Dashboard, Revenue at Risk, Case Detail (with human approve/reject), Recovery Cases, Escalations, Customers, Actions, Analytics (charts), Audit Trail (12,189 events), and Settings (live policy visibility). Design system: dark instrument-panel aesthetic with functional status-color system and "recovery pulse" signature motif.
-- [ ] **Phase 15** — Razorpay test-mode integration
+- [ ] **Phase 15** — Razorpay test-mode integration (optional stretch — see `docs/LIMITATIONS.md`)
 - [x] **Phase 16** — Testing: 37 automated tests passing (pytest, isolated `revive_test` database with per-test transaction rollback) — detection (all 3 scenarios + idempotency), policy engine (retry cap, amount ceiling, confidence floor, live-value verification), scoring, strategy, duplicate-action protection, and two required end-to-end pipeline tests (successful recovery path and safe-failure/escalation path).
 - [x] **Phase 17** — Evaluation engine + baseline comparison: full dataset (2,529 cases, zero backlog) evaluated against a naive baseline. REVIVE recovered ₹8,92,167.88 with a 52.7% per-attempt recovery rate — outperforming the naive baseline's 47.4% by +5.3pp — while avoiding 1,270 unnecessary automatic interventions through policy gating.
-- [ ] **Phase 18** — Demo mode
-- [x] **Phase 19** — Polish: "Run Full Scan" button wired to real detection with live feedback, "Reset Demo Data" safety net (tracked demo-seeded records, cleanly reversible), frontend error-state audit across all 10 screens (proper error messages instead of misleading empty states when the API is unreachable), full mobile responsiveness pass (responsive grids, adaptive table columns, stacked card layouts on narrow screens), and a custom favicon matching the brand's pulse-line motif.
-- [ ] **Phase 20** — Final documentation
+- [x] **Phase 18** — Demo Mode: an 11-step guided walkthrough (`/demo`) runs the entire pipeline live — detect, score, diagnose, strategize, authorize, execute, verify — on a freshly-seeded case each time, plus a deliberate graceful-failure simulation and a live evaluation trigger. Includes a "Reset Demo Data" safety net.
+- [x] **Phase 19** — Polish: "Run Full Scan" wired to real detection with live feedback, consistent error states across all 10 screens, full mobile responsiveness, custom favicon.
+- [x] **Phase 20** — Final documentation: API reference, security notes, known limitations, and a demo guide all written — see Documentation section below.
 
 ---
 
@@ -148,9 +162,12 @@ revive-ai/
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full system architecture, agent state machine, data model
+- [`docs/API.md`](docs/API.md) — every endpoint, grouped by pipeline stage
+- [`docs/EVALUATION.md`](docs/EVALUATION.md) — evaluation methodology, baseline design, and reproducibility tradeoffs
+- [`docs/DEMO.md`](docs/DEMO.md) — how to run the guided walkthrough and explore the app
+- [`docs/SECURITY.md`](docs/SECURITY.md) — what's implemented, what isn't, and why
+- [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) — a plain-spoken account of every known gap
 - [`docs/REVIVE_AI_Phase0_Planning.md`](docs/REVIVE_AI_Phase0_Planning.md) — original requirements analysis and roadmap
-
-Additional docs (`API.md`, `EVALUATION.md`, `DEMO.md`, `SECURITY.md`, `LIMITATIONS.md`) will be added as their corresponding phases are completed.
 
 ---
 
