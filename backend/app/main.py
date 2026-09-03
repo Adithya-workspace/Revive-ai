@@ -10,9 +10,18 @@ app = FastAPI(
 
 # Allow the Next.js frontend (running on localhost:3000) to call this API.
 # We'll tighten this once we're closer to deployment.
+import os
+
+allowed_origins = [
+    "http://localhost:3000",
+]
+vercel_url = os.getenv("FRONTEND_URL")
+if vercel_url:
+    allowed_origins.append(vercel_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
