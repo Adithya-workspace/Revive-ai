@@ -51,7 +51,7 @@ PostgreSQL (Neon) + Audit Trail
 - [x] **Phase 16** — Testing: 37 automated tests passing (pytest, isolated `revive_test` database with per-test transaction rollback) — detection (all 3 scenarios + idempotency), policy engine (retry cap, amount ceiling, confidence floor, live-value verification), scoring, strategy, duplicate-action protection, and two required end-to-end pipeline tests (successful recovery path and safe-failure/escalation path).
 - [x] **Phase 17** — Evaluation engine + baseline comparison: full dataset (2,529 cases, zero backlog) evaluated against a naive baseline. REVIVE recovered ₹8,92,167.88 with a 52.7% per-attempt recovery rate — outperforming the naive baseline's 47.4% by +5.3pp — while avoiding 1,270 unnecessary automatic interventions through policy gating.
 - [ ] **Phase 18** — Demo mode
-- [x] **Phase 19 (in progress)** — Polish: "Run Full Scan" button in the top bar is now fully functional (was previously decorative), triggering a real detection scan with live feedback. Added a "Reset Demo Data" safety net so practicing the Demo Mode walkthrough never permanently drifts the official evaluation numbers — every demo-created record is tracked and cleanly removable.
+- [x] **Phase 19** — Polish: "Run Full Scan" button wired to real detection with live feedback, "Reset Demo Data" safety net (tracked demo-seeded records, cleanly reversible), frontend error-state audit across all 10 screens (proper error messages instead of misleading empty states when the API is unreachable), full mobile responsiveness pass (responsive grids, adaptive table columns, stacked card layouts on narrow screens), and a custom favicon matching the brand's pulse-line motif.
 - [ ] **Phase 20** — Final documentation
 
 ---
